@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM - SOS Informatique : Résoudre les Pannes</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --card-hover: #262626;
+            --text-color: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --accent-color: #DEFF9A;
+            --accent-hover: #c9f578;
+            --correct-color: #4EAE67;
+            --correct-bg: rgba(78, 174, 103, 0.15);
+            --wrong-color: #FF6B6B;
+            --wrong-bg: rgba(255, 107, 107, 0.15);
+            --border-color: #2F2F2F;
+            --border-radius: 14px;
+            --font-stack: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .quiz-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 780px;
+            padding: 28px;
+            position: relative;
+        }
+
+        .quiz-header {
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(222, 255, 154, 0.12);
+            color: var(--accent-color);
+            border: 1px solid rgba(222, 255, 154, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-pill {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #121212;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        .progress-section {
+            margin-top: 14px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #121212;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #A8E85A, var(--accent-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        .question-card {
+            margin: 20px 0;
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 1.18rem;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-button {
+            background-color: #232323;
+            border: 1.5px solid #333333;
+            border-radius: 10px;
+            color: var(--text-color);
+            padding: 14px 16px;
+            font-size: 0.98rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: inherit;
+        }
+
+        .option-button:hover:not(:disabled) {
+            background-color: var(--card-hover);
+            border-color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .option-button:disabled {
+            cursor: default;
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .option-button.correct::after {
+            content: "✓";
+            color: var(--correct-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+            color: #FFFFFF;
+        }
+
+        .option-button.wrong::after {
+            content: "✕";
+            color: var(--wrong-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.dimmed {
+            opacity: 0.45;
+        }
+
+        .feedback-container {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .feedback-container.correct {
+            background-color: var(--correct-bg);
+            border-left: 4px solid var(--correct-color);
+        }
+
+        .feedback-container.wrong {
+            background-color: var(--wrong-bg);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .feedback-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .feedback-container.correct .feedback-title {
+            color: var(--correct-color);
+        }
+
+        .feedback-container.wrong .feedback-title {
+            color: var(--wrong-color);
+        }
+
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.45;
+        }
+
+        .actions-row {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(222, 255, 154, 0.25);
+        }
+
+        .btn-action:disabled {
+            background-color: #2D2D2D;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results-view {
+            text-align: center;
+            padding: 10px 0;
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: #171717;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 24px rgba(222, 255, 154, 0.15);
+        }
+
+        .score-val {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        .score-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .results-view h2 {
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 0.98rem;
+            color: var(--text-color);
+            max-width: 580px;
+            margin: 0 auto 24px auto;
+            line-height: 1.5;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 360px;
+            margin: 0 auto 24px auto;
+        }
+
+        .stat-box {
+            background-color: #151515;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-num.succ { color: var(--correct-color); }
+        .stat-num.err { color: var(--wrong-color); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-wrapper {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .question-title {
+                font-size: 1.05rem;
+            }
+            .option-button {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+            .score-circle-wrapper {
+                width: 130px;
+                height: 130px;
+            }
+            .score-val {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <div id="quiz-view">
+            <div class="quiz-header">
+                <div class="header-top">
+                    <span class="tag-badge">🔧 SOS Dépannage Informatique</span>
+                    <span class="score-pill" id="live-score">Score : 0 / 40</span>
+                </div>
+                <h1>Résoudre les Pannes Numériques</h1>
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Progression</span>
+                        <span id="progress-text">Question 1 sur 40</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-number" id="question-index-label">Question 1</div>
+                <div class="question-title" id="question-text">Chargement de la question...</div>
+                <div class="options-list" id="options-container"></div>
+            </div>
+
+            <div class="feedback-container" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">Bonne réponse !</div>
+                <div class="feedback-text" id="feedback-desc">Explication pédagogique...</div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-action" id="next-btn" disabled>Question suivante ➔</button>
+            </div>
+        </div>
+
+        <div class="results-view" id="results-view">
+            <span class="tag-badge" style="margin-bottom: 14px;">Bilan As du Dépannage</span>
+            
+            <div class="score-circle-wrapper">
+                <div class="score-val" id="final-percent">0%</div>
+                <div class="score-sub">Score Final</div>
+            </div>
+
+            <h2 id="result-title-text">Niveau de Maîtrise</h2>
+            <p class="result-description" id="result-desc-text">Commentaire d'évaluation...</p>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-num succ" id="stat-correct-count">0</div>
+                    <div class="stat-label">Réponses correctes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num err" id="stat-wrong-count">0</div>
+                    <div class="stat-label">Erreurs / Pièges</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="restartQuiz()">🔄 Recommencer l'évaluation</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuestions = [
+            // Slide 2 : Matériel ou Logiciel ? Comprendre pour mieux réparer
+            {
+                q: "Comment définit-on le « Matériel » (Hardware) en informatique ?",
+                options: [
+                    "C'est tout ce que l'on peut toucher physiquement (composants, périphériques, câbles)",
+                    "C'est un programme qui tourne dans la mémoire de la machine",
+                    "C'est un mot de passe refusé par l'ENT",
+                    "C'est une page Web qui met du temps à se charger"
+                ],
+                answer: 0,
+                feedback: "Le matériel (Hardware) regroupe l'ensemble des éléments physiques tangibles de l'ordinateur."
+            },
+            {
+                q: "Parmi ces pannes, laquelle relève d'un problème de MATÉRIEL (Hardware) ?",
+                options: [
+                    "Un câble d'alimentation débranché, un écran cassé ou une souris sans pile",
+                    "Un programme qui se fige et plante",
+                    "Un fichier texte impossible à ouvrir",
+                    "Un mot de passe refusé à la connexion"
+                ],
+                answer: 0,
+                feedback: "Les câbles débranchés, écrans fêlés, piles vides ou claviers mouillés sont des pannes matérielles physiques."
+            },
+            {
+                q: "Comment définit-on le « Logiciel » (Software) ?",
+                options: [
+                    "C'est tout ce qui tourne à l'intérieur de la machine (système, programmes, applications)",
+                    "C'est la boîte en métal de l'unité centrale",
+                    "C'est le plastique de la souris d'ordinateur",
+                    "C'est la prise électrique murale"
+                ],
+                answer: 0,
+                feedback: "Le logiciel (Software) désigne le code, les applications et le système d'exploitation qui animent la machine."
+            },
+            {
+                q: "Parmi les situations suivantes, laquelle correspond à un problème de LOGICIEL (Software) ?",
+                options: [
+                    "Une application qui plante, un mot de passe refusé ou une page Web très lente",
+                    "Un bouton d'allumage physiquement bloqué",
+                    "Un verre d'eau renversé sur le clavier",
+                    "Une prise réseau déclipsée du mur"
+                ],
+                answer: 0,
+                feedback: "Les bugs d'applications, les erreurs d'identification ou la lenteur de navigation sont des soucis logiciels."
+            },
+
+            // Slide 3 : La Méthodologie : Les 3 Réflexes d'Or
+            {
+                q: "Quels sont les « 3 Réflexes d'Or » à suivre dans l'ordre face à une panne informatique ?",
+                options: [
+                    "1. Garder son calme ➔ 2. Vérifier les branchements ➔ 3. Redémarrer la machine",
+                    "1. Taper sur l'écran ➔ 2. Tirer sur les câbles ➔ 3. Crier",
+                    "1. Racheter un ordinateur ➔ 2. Tout éteindre ➔ 3. Pleurer",
+                    "1. Démonter l'unité centrale ➔ 2. Couper le courant ➔ 3. Formater"
+                ],
+                answer: 0,
+                feedback: "La méthodologie infaillible commence par le calme, continue par l'inspection des câbles et se termine par le redémarrage."
+            },
+            {
+                q: "Pourquoi le 1er réflexe d'or exige-t-il de « Garder son calme » ?",
+                options: [
+                    "Pour observer sans s'énerver et surtout éviter de taper sur les touches au hasard",
+                    "Pour laisser l'ordinateur s'éteindre tout seul après 2 heures",
+                    "Pour attendre que la sonnerie de la récréation retentisse",
+                    "Pour ne pas réveiller le processeur"
+                ],
+                answer: 0,
+                feedback: "S'énerver et marteler le clavier risque d'aggraver la panne ou de bloquer davantage le système."
+            },
+            {
+                q: "Pourquoi le 2ème réflexe d'or préconise-t-il de « Vérifier les branchements » en premier lieu ?",
+                options: [
+                    "Parce que les premiers suspects sont presque toujours physiques (câbles, prise murale, batterie)",
+                    "Parce que les câbles changent de couleur quand il y a un bug",
+                    "Pour vérifier si l'électricité a une odeur",
+                    "Pour nettoyer les câbles avec un chiffon mouillé"
+                ],
+                answer: 0,
+                feedback: "Une grande majorité des pannes apparentes provient simplement d'une prise mal enfoncée ou d'un câble débranché."
+            },
+            {
+                q: "Quelle proportion des petits soucis du quotidien le 3ème réflexe d'or (« Redémarrer ») permet-il de résoudre ?",
+                options: [
+                    "Plus de 80% des petits soucis du quotidien !",
+                    "Moins de 5%",
+                    "Exactement 10%",
+                    "Aucun problème"
+                ],
+                answer: 0,
+                feedback: "Le redémarrage est l'action magique qui règle plus de 8 pannes logicielles sur 10."
+            },
+
+            // Slide 4 : Zoom sur les branchements (Où mener l'enquête physique ?)
+            {
+                q: "Lors de l'enquête physique sur le « Câble d'Alimentation », que doit-on vérifier ?",
+                options: [
+                    "S'il est bien enfoncé des DEUX côtés (côté machine ET côté prise secteur)",
+                    "S'il mesure plus de 5 mètres de long",
+                    "S'il est enroulé autour de la chaise",
+                    "S'il est branché sur l'écran voisin"
+                ],
+                answer: 0,
+                feedback: "Un câble peut être branché au mur mais légèrement déconnecté à l'arrière de l'ordinateur (ou inversement)."
+            },
+            {
+                q: "Concernant « L'Interrupteur », quelle vérification basique doit-on effectuer ?",
+                options: [
+                    "Vérifier que le bouton de l'écran ou de la multiprise est bien en position 'ON' (allumé)",
+                    "Changer le fusible de la maison",
+                    "Appuyer 50 fois très vite sur le bouton",
+                    "Débrancher l'interrupteur avec un tournevis"
+                ],
+                answer: 0,
+                feedback: "Une multiprise éteinte ou un écran en veille non alimenté empêchent tout fonctionnement."
+            },
+            {
+                q: "Si vous travaillez sur une tablette ou un PC portable qui refuse de s'allumer, que vérifie-t-on pour la « Batterie » ?",
+                options: [
+                    "Si l'appareil n'est pas tout simplement complètement déchargé",
+                    "Si la batterie a changé de taille",
+                    "Si l'appareil a pris du poids",
+                    "Si l'écran est propre"
+                ],
+                answer: 0,
+                feedback: "Une batterie à 0% nécessite quelques minutes de branchement au chargeur avant de pouvoir redémarrer."
+            },
+            {
+                q: "Que contrôle-t-on au niveau des « Périphériques » (souris, clavier, réseau) ?",
+                options: [
+                    "Si le câble réseau ou l'adaptateur sans fil USB est bien inséré dans le port",
+                    "Si la souris est de la même couleur que l'écran",
+                    "Si le tapis de souris est en tissu",
+                    "Si le clavier comporte des touches en bois"
+                ],
+                answer: 0,
+                feedback: "Un faux contact ou une clé USB sans fil mal enclenchée paralyse immédiatement la souris ou le clavier."
+            },
+
+            // Slide 5 : La Magie du Redémarrage (Pourquoi ça fonctionne si bien ?)
+            {
+                q: "Que se passe-t-il dans la « Mémoire Vive (RAM) » lors d'un redémarrage ?",
+                options: [
+                    "Elle se vide complètement, effaçant d'un coup tous les petits bugs accumulés dans la journée",
+                    "Elle enregistre tous les virus sur le disque dur",
+                    "Elle supprime tous vos devoirs définitivement",
+                    "Elle double la taille de l'écran"
+                ],
+                answer: 0,
+                feedback: "La RAM est une mémoire temporaire : redémarrer la remet à zéro, nettoyant les blocages logiciels."
+            },
+            {
+                q: "Comment le redémarrage traite-t-il les « programmes bloqués » ou cachés ?",
+                options: [
+                    "Les applications cachées ou plantées sont forcées de s'arrêter pour repartir de zéro",
+                    "Il leur donne plus de mémoire pour continuer à planter",
+                    "Il envoie un message d'alerte à la police",
+                    "Il les transforme en jeux vidéo"
+                ],
+                answer: 0,
+                feedback: "Redémarrer force la fermeture propre de tous les processus invisibles qui saturaient la machine."
+            },
+            {
+                q: "Quel est l'état du système « Après » un redémarrage réussi ?",
+                options: [
+                    "Le système est relancé proprement et retrouve son état de fonctionnement d'origine",
+                    "L'ordinateur est plus lent qu'avant",
+                    "L'ordinateur a perdu son mot de passe",
+                    "Le disque dur est complètement vide"
+                ],
+                answer: 0,
+                feedback: "Le redémarrage offre un nouveau départ sans les résidus de mémoire qui causaient le ralentissement."
+            },
+
+            // Slide 6 : Cas Pratique A : Mon écran reste noir !
+            {
+                q: "Cas Pratique A : Mon écran reste noir. Quel est le 1er point de la check-list du détective ?",
+                options: [
+                    "Vérifier le voyant lumineux de la machine (l'unité centrale ou la tablette est-elle vraiment allumée ?)",
+                    "Changer immédiatement de moniteur",
+                    "Racheter un clavier neuf",
+                    "Appeler les pompiers"
+                ],
+                answer: 0,
+                feedback: "Si l'unité centrale est éteinte, l'écran ne peut évidemment rien afficher."
+            },
+            {
+                q: "Cas Pratique A : Quel est le 2ème point à contrôler sur l'écran lui-même ?",
+                options: [
+                    "Vérifier si l'écran a son propre bouton d'alimentation activé (témoin LED allumé)",
+                    "Nettoyer la vitre avec du liquide vaisselle",
+                    "Tourner l'écran vers le mur",
+                    "Taper sur le bord de l'écran"
+                ],
+                answer: 0,
+                feedback: "L'écran dispose de son propre interrupteur : il peut être éteint alors que l'unité centrale tourne."
+            },
+            {
+                q: "Cas Pratique A : Quel câble essentiel relie l'ordinateur à l'écran (Point n°3) ?",
+                options: [
+                    "Le câble vidéo (HDMI ou VGA), qui doit être bien branché derrière l'écran ET derrière l'ordinateur",
+                    "Le câble audio de la prise casque",
+                    "Le câble du chargeur de téléphone",
+                    "Le câble de l'imprimante"
+                ],
+                answer: 0,
+                feedback: "Le câble HDMI ou VGA transporte le signal vidéo : s'il est mal vissé ou déboîté, l'écran reste noir."
+            },
+
+            // Slide 7 : Cas Pratique B : Pas de connexion Internet
+            {
+                q: "En réseau CÂBLÉ au collège, que signifie le test du « Clic » ?",
+                options: [
+                    "Vérifier que le câble réseau (Ethernet) est bien clipsé avec sa petite languette dans la prise",
+                    "Cliquer 100 fois sur le bouton gauche de la souris",
+                    "Faire claquer ses doigts devant l'ordinateur",
+                    "Cliquer sur le menu Démarrer"
+                ],
+                answer: 0,
+                feedback: "Le câble RJ45 Ethernet doit émettre un petit 'clic' mécanique pour assurer le contact électrique."
+            },
+            {
+                q: "Au niveau de la prise réseau du PC, que signifie « La lumière » qui clignote ?",
+                options: [
+                    "La petite diode verte/orange indique que les données circulent bien avec le réseau du collège",
+                    "Qu'il y a un court-circuit dangereux",
+                    "Que l'ordinateur va s'éteindre dans 10 secondes",
+                    "Que l'écran est en surchauffe"
+                ],
+                answer: 0,
+                feedback: "Les diodes lumineuses du port réseau confirment l'activité et la liaison physique au réseau local."
+            },
+            {
+                q: "En connexion Wi-Fi (tablette/maison), quel piège courant faut-il vérifier en premier ?",
+                options: [
+                    "Vérifier que l'icône 'Mode Avion' n'a pas été activée par erreur",
+                    "Vérifier si la batterie est à 100%",
+                    "Vérifier si la pièce est éclairée",
+                    "Vérifier si la caméra est allumée"
+                ],
+                answer: 0,
+                feedback: "Le Mode Avion coupe instantanément toutes les connexions sans fil (Wi-Fi et Bluetooth)."
+            },
+            {
+                q: "Si la connexion Wi-Fi ne fonctionne toujours pas à la maison, quelle action réseau est conseillée ?",
+                options: [
+                    "Redémarrer la box Internet familiale",
+                    "Changer d'opérateur téléphonique immédiatement",
+                    "Jeter sa tablette à la poubelle",
+                    "Couper les câbles de la rue"
+                ],
+                answer: 0,
+                feedback: "Redémarrer la box Internet réinitialise le signal Wi-Fi et résout la plupart des blocages de connexion à domicile."
+            },
+
+            // Slide 8 : Cas Pratique C : Une application est bloquée
+            {
+                q: "Cas Pratique C : Une application se bloque. Que doit-on faire pendant l'Étape 1 ?",
+                options: [
+                    "Patienter 30 secondes : la machine fait peut-être un gros calcul, laissons-lui un peu de temps !",
+                    "Casser la souris d'énervement",
+                    "Débrancher la prise électrique immédiatement",
+                    "Éteindre l'interrupteur général de la salle"
+                ],
+                answer: 0,
+                feedback: "Un logiciel peut temporairement figer pendant le traitement d'une tâche lourde ; patienter évite d'interrompre un calcul normal."
+            },
+            {
+                q: "Quel raccourci clavier permet de tenter une « fermeture douce » de la fenêtre bloquée (Étape 2) ?",
+                options: [
+                    "Le raccourci `Alt + F4` (ou cliquer sur la croix rouge)",
+                    "Le raccourci `Ctrl + C`",
+                    "La touche `Espace`",
+                    "La touche `Majuscule`"
+                ],
+                answer: 0,
+                feedback: "`Alt + F4` est le raccourci standard pour demander la fermeture de la fenêtre active."
+            },
+            {
+                q: "Sous Windows, quelle combinaison de touches magiques ouvre « Le Gestionnaire de Tâches » (Étape 3) ?",
+                options: [
+                    "`Ctrl + Alt + Suppr`",
+                    "`Ctrl + V`",
+                    "`Alt + Tab`",
+                    "`Maj + Entrée`"
+                ],
+                answer: 0,
+                feedback: "`Ctrl + Alt + Suppr` ouvre les options de sécurité et permet de lancer le Gestionnaire des tâches pour tuer le processus bloqué."
+            },
+            {
+                q: "Quel est l'avantage du Gestionnaire de Tâches par rapport à l'extinction brutale du PC ?",
+                options: [
+                    "Il permet d'arrêter précisément le logiciel bloqué sans redémarrer tout l'ordinateur ni perdre les autres travaux ouverts",
+                    "Il accélère la vitesse des ventilateurs",
+                    "Il nettoie l'écran des traces de doigts",
+                    "Il réinstalle Windows automatiquement"
+                ],
+                answer: 0,
+                feedback: "Il isole le programme défaillant et le ferme individuellement sans impacter le reste du système."
+            },
+
+            // Slide 9 : Le Guide Rapide des Petites Pannes
+            {
+                q: "Symptôme : « Pas de son dans le casque ». Quelle est la cause probable et la solution ?",
+                options: [
+                    "Prise jack débranchée ou mode Muet activé ➔ Rebrancher et régler le volume dans la barre des tâches",
+                    "L'ordinateur n'a pas de carte mère ➔ Racheter un PC",
+                    "Le fichier est trop lourd ➔ Supprimer le document",
+                    "Le clavier est en majuscule ➔ Appuyer sur Entrée"
+                ],
+                answer: 0,
+                feedback: "Une prise jack mal enclenchée ou le curseur de volume à zéro/muet expliquent l'absence de son."
+            },
+            {
+                q: "Symptôme : « La souris ne bouge plus du tout ». Quelle manipulation tester en premier ?",
+                options: [
+                    "Changer de port USB ou remplacer les piles si elle est sans fil",
+                    "Changer d'écran d'ordinateur",
+                    "Désinstaller le traitement de texte",
+                    "Augmenter la luminosité de la pièce"
+                ],
+                answer: 0,
+                feedback: "Tester un autre port USB ou remplacer des piles déchargées résout le problème de pointeur immobile."
+            },
+            {
+                q: "Symptôme : « Mot de passe refusé sur l'ENT ». Quelle touche du clavier est la coupable classique ?",
+                options: [
+                    "La touche Majuscule (Caps Lock) restée verrouillée par erreur",
+                    "La touche Espace",
+                    "La touche Échap",
+                    "La touche F1"
+                ],
+                answer: 0,
+                feedback: "Les mots de passe étant sensibles à la casse, taper en majuscules sans le savoir rend le mot de passe invalide."
+            },
+            {
+                q: "Symptôme : « Document de travail introuvable ». Quelle méthode rapide permet de le retrouver ?",
+                options: [
+                    "Utiliser la barre de recherche du gestionnaire de fichiers en tapant le nom ou la matière",
+                    "Recommencer tout le devoir depuis le début sans chercher",
+                    "Éteindre l'ordinateur en espérant qu'il réapparaisse",
+                    "Regarder sous la table"
+                ],
+                answer: 0,
+                feedback: "L'outil de recherche de l'explorateur de fichiers scanne l'ensemble des disques pour retrouver le document égaré."
+            },
+
+            // Slide 10 : Prévention : Le Pouvoir des Mises à Jour
+            {
+                q: "Selon l'adage « Mieux vaut prévenir que guérir », à quoi sert l'action de « Réparer » via les mises à jour ?",
+                options: [
+                    "À corriger les bugs connus avant qu'ils ne fassent planter ta machine",
+                    "À changer la couleur de ton bureau",
+                    "À effacer tes photos de vacances",
+                    "À bloquer le clavier"
+                ],
+                answer: 0,
+                feedback: "Les développeurs publient des correctifs pour éliminer les instabilités logicielles identifiées."
+            },
+            {
+                q: "Pourquoi les mises à jour permettent-elles de « Fermer les portes » de ton système ?",
+                options: [
+                    "Elles bloquent l'accès aux virus et aux cyberattaques en comblant les failles de sécurité",
+                    "Elles ferment les fenêtres de la salle de classe",
+                    "Elles éteignent le rétroéclairage",
+                    "Elles interdisent l'accès aux sites scolaires"
+                ],
+                answer: 0,
+                feedback: "Les failles de sécurité non corrigées sont les portes d'entrée préférées des pirates et logiciels malveillants."
+            },
+            {
+                q: "Quel avantage fonctionnel (« Ajouter ») les mises à jour régulières apportent-elles pour ton travail scolaire ?",
+                options: [
+                    "Elles ajoutent de nouvelles fonctionnalités utiles et améliorent le confort d'utilisation",
+                    "Elles rendent l'ordinateur payant",
+                    "Elles suppriment la barre des tâches",
+                    "Elles réduisent la taille du disque dur"
+                ],
+                answer: 0,
+                feedback: "Les mises à jour enrichissent les logiciels avec de nouveaux outils, options et améliorations de performances."
+            },
+
+            // Slide 11 : Les 4 Piliers de l'Entretien du Matériel
+            {
+                q: "Concernant « L'Espace de Travail » (Pilier n°1), quelle règle stricte d'hygiène physique s'applique ?",
+                options: [
+                    "Pas de miettes ni de liquides près du clavier : nettoie ton bureau !",
+                    "Boire une canette de soda au-dessus du clavier ouvert",
+                    "Manger des biscuits au-dessus de l'unité centrale",
+                    "Poser des objets lourds sur l'écran"
+                ],
+                answer: 0,
+                feedback: "Les liquides et miettes provoquent des courts-circuits destructeurs et bloquent les touches mécaniques."
+            },
+            {
+                q: "En quoi consiste le pilier « Le Grand Ménage » pour le disque dur ?",
+                options: [
+                    "Vider la corbeille régulièrement pour empêcher de saturer le disque dur de la machine",
+                    "Laver le disque dur avec une éponge humide",
+                    "Effacer les logiciels du système",
+                    "Remplir le disque avec des fichiers doublons"
+                ],
+                answer: 0,
+                feedback: "Les fichiers mis à la corbeille occupent toujours de l'espace tant que celle-ci n'est pas vidée."
+            },
+            {
+                q: "Pour le pilier « La Protection », quel outil actif bloque les programmes malveillants (clés USB, e-mails) ?",
+                options: [
+                    "Un Antivirus actif et maintenu à jour",
+                    "Un fond d'écran sombre",
+                    "Un écran de veille avec des photos",
+                    "Un cadenas physique sur le câble réseau"
+                ],
+                answer: 0,
+                feedback: "L'antivirus analyse les flux entrants (fichiers téléchargés, clés USB insérées) pour bloquer les menaces."
+            },
+            {
+                q: "Où doit-on effectuer « La Sauvegarde » (Pilier n°4) pour être certain de ne jamais perdre ses devoirs ?",
+                options: [
+                    "Sur l'ENT, le Cloud scolaire ou un espace classe sécurisé",
+                    "Sur un post-it collé sur son cahier",
+                    "Dans la corbeille temporaire",
+                    "Sur l'ordinateur d'un inconnu"
+                ],
+                answer: 0,
+                feedback: "Enregistrer sur l'ENT ou le Cloud garantit de retrouver ses fichiers même en cas de panne matérielle totale du PC."
+            },
+
+            // Slide 12 & 13 : Et si rien ne fonctionne ? La Pyramide de l'Aide au Collège
+            {
+                q: "Dans la « Pyramide de l'Aide au Collège », qui constitue « La Base (Niveau 4) » de la résolution ?",
+                options: [
+                    "Toi-même : tu as testé méthodiquement les 3 Réflexes d'Or en toute autonomie",
+                    "Le Ministère de l'Éducation nationale",
+                    "Le fabricant de l'ordinateur",
+                    "Le gardien du collège"
+                ],
+                answer: 0,
+                feedback: "L'élève constitue le premier maillon en appliquant avec rigueur les vérifications de premier niveau."
+            },
+            {
+                q: "Si la panne persiste en classe pendant un cours, à qui t'adresses-tu immédiatement (Niveau 3) ?",
+                options: [
+                    "À ton Enseignant en classe pour l'informer que la panne t'empêche de travailler",
+                    "À tes camarades en criant dans la salle",
+                    "Au président de la République",
+                    "Tu quittes la classe sans rien dire"
+                ],
+                answer: 0,
+                feedback: "L'enseignant prend en compte le problème et peut t'assigner un autre poste ou t'aider à débloquer la situation."
+            },
+            {
+                q: "Qui est le « RUPN » (Niveau 2 de la pyramide d'aide) au collège ?",
+                options: [
+                    "Le Référent Numérique : le professeur responsable du matériel et des grosses pannes de l'établissement",
+                    "Le responsable de la cantine scolaire",
+                    "Un robot automatique qui répare les écrans",
+                    "L'élève le plus jeune de la classe"
+                ],
+                answer: 0,
+                feedback: "Le RUPN (Référent aux Usages Pédagogiques du Numérique) administre le parc informatique et gère les pannes complexes."
+            },
+            {
+                q: "Dans quel cas fait-on appel à « L'Assistance Technique (Niveau 1 - Dernier recours) » ?",
+                options: [
+                    "Pour les tickets de support lourds (comptes ENT bloqués, pannes matérielles de tablettes régionales)",
+                    "Pour allumer l'écran de l'ordinateur",
+                    "Pour brancher une prise casque audio",
+                    "Pour taper son prénom sur le clavier"
+                ],
+                answer: 0,
+                feedback: "L'assistance technique intervient sur les pannes de serveurs, comptes d'accès académiques ou casses matérielles sous garantie."
+            },
+
+            // Slide 14 : Le Logigramme du Dépanneur
+            {
+                q: "Dans le logigramme du dépanneur, quelle est la 1ère étape mentale au DÉPART ?",
+                options: [
+                    "Identifier la nature de la panne : est-ce un problème Matériel ou Logiciel ?",
+                    "Appeler immédiatement le dépanneur sans regarder",
+                    "Débrancher tous les fils de la salle",
+                    "Formater l'ordinateur"
+                ],
+                answer: 0,
+                feedback: "Diagnostiquer si la panne est physique (matériel) ou logique (logiciel) oriente directement les actions à mener."
+            },
+            {
+                q: "Si après avoir gardé son calme, vérifié les câbles/Wi-Fi et redémarré la machine, le problème n'est PAS résolu, que fais-tu ?",
+                options: [
+                    "J'alerte mon professeur ou le RUPN du collège",
+                    "Je tape sur l'unité centrale avec mon pied",
+                    "J'éteins la lumière de la classe",
+                    "J'abandonne ma scolarité"
+                ],
+                answer: 0,
+                feedback: "Lorsque les 3 réflexes d'or échouent, on passe le relais à l'échelon supérieur de la pyramide d'aide."
+            },
+            {
+                q: "Si le diagnostic final indique 'OUI, le problème est résolu !', quelle est l'étape suivante ?",
+                options: [
+                    "Fin de l'alerte ! Tu peux reprendre ton travail sereinement comme un As du Dépannage !",
+                    "Éteindre l'ordinateur pour fêter ça",
+                    "Tout débrancher pour recommencer",
+                    "Changer de mot de passe"
+                ],
+                answer: 0,
+                feedback: "Bravo ! Tu as su résoudre la panne en toute autonomie grâce à la méthodologie du dépanneur."
+            }
+        ];
+
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        const questionText = document.getElementById('question-text');
+        const questionIndexLabel = document.getElementById('question-index-label');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const liveScore = document.getElementById('live-score');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const nextBtn = document.getElementById('next-btn');
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(rawQuestions).map(q => {
+                const mappedOptions = q.options.map((optText, originalIndex) => ({
+                    text: optText,
+                    isCorrect: originalIndex === q.answer
+                }));
+                return {
+                    q: q.q,
+                    options: shuffleArray(mappedOptions),
+                    feedback: q.feedback
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+
+            quizView.style.display = 'block';
+            resultsView.style.display = 'none';
+            liveScore.innerText = `Score : 0 / ${questions.length}`;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswered = false;
+            nextBtn.disabled = true;
+            feedbackBox.style.display = 'none';
+
+            const total = questions.length;
+            const currentNum = currentIndex + 1;
+            const qData = questions[currentIndex];
+
+            progressText.innerText = `Question ${currentNum} sur ${total}`;
+            questionIndexLabel.innerText = `Question ${currentNum} / ${total}`;
+            progressBar.style.width = `${(currentNum / total) * 100}%`;
+
+            questionText.innerText = qData.q;
+
+            optionsContainer.innerHTML = '';
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-button';
+                btn.innerText = opt.text;
+                btn.onclick = () => handleSelectOption(idx, opt.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+
+            if (currentIndex === total - 1) {
+                nextBtn.innerText = "Consulter le Bilan Final ➔";
+            } else {
+                nextBtn.innerText = "Question suivante ➔";
+            }
+        }
+
+        function handleSelectOption(selectedIdx, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const buttons = optionsContainer.querySelectorAll('.option-button');
+            const qData = questions[currentIndex];
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qData.options[idx].isCorrect) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('wrong');
+                } else {
+                    btn.classList.add('dimmed');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackBox.className = 'feedback-container correct';
+                feedbackTitle.innerText = "✓ Bonne réponse !";
+            } else {
+                feedbackBox.className = 'feedback-container wrong';
+                feedbackTitle.innerText = "✕ Mauvaise réponse !";
+            }
+
+            liveScore.innerText = `Score : ${score} / ${questions.length}`;
+            feedbackDesc.innerText = qData.feedback;
+            feedbackBox.style.display = 'block';
+
+            nextBtn.disabled = false;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizView.style.display = 'none';
+            resultsView.style.display = 'block';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById('final-percent').innerText = `${percent}%`;
+            document.getElementById('stat-correct-count').innerText = score;
+            document.getElementById('stat-wrong-count').innerText = total - score;
+
+            const titleEl = document.getElementById('result-title-text');
+            const descEl = document.getElementById('result-desc-text');
+
+            if (percent >= 90) {
+                titleEl.innerText = "🏆 Grand Maître As du Dépannage !";
+                descEl.innerText = "Félicitations ! Tu maîtrises parfaitement la distinction Matériel/Logiciel, les 3 Réflexes d'Or (Calme, Branchements, Redémarrage), la magie de la RAM, les cas pratiques (écran noir, panne réseau, application bloquée avec Ctrl+Alt+Suppr), les 4 piliers de l'entretien et la pyramide de l'aide au collège (RUPN). Aucune panne ne peut te résister !";
+            } else if (percent >= 75) {
+                titleEl.innerText = "⭐ Dépanneur Numérique Confirmé !";
+                descEl.innerText = "Très bon score ! Tu as acquis une excellente méthode pour diagnostiquer, vérifier les branchements physiques et relancer tes équipements en toute autonomie.";
+            } else if (percent >= 50) {
+                titleEl.innerText = "🔧 Apprenti Technicien";
+                descEl.innerText = "Des bases acquises, mais attention aux pièges : revois bien le logigramme du dépanneur, les raccourcis de secours (Alt+F4, Ctrl+Alt+Suppr), la gestion des câbles vidéo et le rôle du RUPN.";
+            } else {
+                titleEl.innerText = "⚠️ Guide SOS Panne à Relire";
+                descEl.innerText = "Attention aux mauvais réflexes en cas de panne ! Relis attentivement les diapositives du cours, mémorise les 3 Réflexes d'Or et la check-list des branchements, puis retente l'évaluation pour valider tes compétences.";
+            }
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
